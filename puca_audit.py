@@ -107,7 +107,7 @@ if __name__ == '__main__':
         response, payload = get_session()
     
     urls = get_urls(response)
-    transactions = get_transactions(urls[:2], payload)
+    transactions = get_transactions(urls, payload)
     
     fout = 'puca_transactions.txt'
     with open(fout, 'w') as f:
