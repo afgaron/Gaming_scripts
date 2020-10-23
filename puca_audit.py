@@ -1,4 +1,8 @@
-import requests, pprint
+import requests, pprint, sys
+
+# Backwards compatibility between Python 2 and 3
+if sys.version_info.major == 3:
+    raw_input = input
 
 # Global variables
 root_url = 'https://pucatrade.com'
@@ -103,7 +107,7 @@ if __name__ == '__main__':
         response, payload = get_session()
     
     urls = get_urls(response)
-    transactions = get_transactions(urls, payload)
+    transactions = get_transactions(urls[:2], payload)
     
     fout = 'puca_transactions.txt'
     with open(fout, 'w') as f:
