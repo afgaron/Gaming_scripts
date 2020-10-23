@@ -112,4 +112,3 @@ if __name__ == '__main__':
         print('Transaction summary written to %s' % fout)
     
     get_stats(transactions, fout)
-    
