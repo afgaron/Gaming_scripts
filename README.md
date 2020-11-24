@@ -1,2 +1,2 @@
-# Magic_scripts
-Collection of MTG-related scripts
+# Gaming_scripts
+Collection of gaming-related scripts
