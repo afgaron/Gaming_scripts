@@ -7,10 +7,11 @@ from tkinter import filedialog as fd
 
 # GUI to enter promo values
 class GUI(tk.Tk):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, filename, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
         self.title("PucaTrade Marketplace Pricer")
-        self.filename = fd.askopenfilename()
+        #self.filename = fd.askopenfilename()
+        self.filename = filename
         self.button_add = None
         self.button_quit = None
         self.prices = []
@@ -46,7 +47,7 @@ class GUI(tk.Tk):
         #edit_file(self.filename, dict(zip(prices, promos)))
         print(self.filename, dict(zip(prices, promos)))
         self.quit()
-        self.destroy()
+        #self.destroy()
 
 
 def edit_file(filename_in, promo_dict):
@@ -86,6 +87,8 @@ def edit_file(filename_in, promo_dict):
             print(new_line, file=f_out)
 
 if __name__ == "__main__":
+
+    filename = fd.askopenfilename()
     
-    root = GUI()
+    root = GUI(filename)
     root.mainloop()
