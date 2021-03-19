@@ -1,48 +1,91 @@
-# This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License. Original author is dude1818 on PucaTrade.com
+'''
+This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License. Original author is dude1818 on PucaTrade.com (https://pucatrade.com/profiles/show/129317)
+'''
 
-########## Edit the following two variables with the name of your have list file and any number of thresholds you want ##########
+import tkinter as tk
+from tkinter import filedialog as fd
 
-file_in = "20210318-PucaTrade-PAPER-Have.csv"  # name of exported haves list
-promo_threshold = {
-    0: None,  # don't list bulk for sale
-    100: 75,  # cards worth 100pp and above get 75% promo
-    500: 105,  # etc.
-    250: 95,  # cards worth 250pp and above get 95% promo
-    1000: 115,
-}
+# GUI to enter promo values
+class GUI(tk.Tk):
+    def __init__(self, *args, **kwargs):
+        tk.Tk.__init__(self, *args, **kwargs)
+        self.title("PucaTrade Marketplace Pricer")
+        self.filename = fd.askopenfilename()
+        self.button_add = None
+        self.button_quit = None
+        self.prices = []
+        self.promos = []
+        self.row_count = 0
+        self.add_row()
 
-########## Don't mess with anything below this line ##########
+    def add_row(self):
+        if self.button_add is not None:
+            self.button_add.grid_forget()
+        if self.button_quit is not None:
+            self.button_quit.grid_forget()
+        self.prices.append(tk.Entry())
+        self.prices[-1].grid(row=self.row_count, column=0)
+        self.promos.append(tk.Entry())
+        self.promos[-1].grid(row=self.row_count, column=1)
+        self.button_add = tk.Button(text="Add another row", command=self.add_row)
+        self.button_add.grid(
+            row=self.row_count + 1, column=0, columnspan=2, sticky=tk.W + tk.E
+        )
+        self.button_quit = tk.Button(
+            text="Apply and close", command=self.apply_and_close
+        )
+        self.button_quit.grid(
+            row=self.row_count + 2, column=0, columnspan=2, sticky=tk.W + tk.E
+        )
+        self.row_count += 1
 
-file_out = file_in[:-4] + "_edited.csv"
-promo_sorted = {}
-for key in sorted(promo_threshold.keys()):
-    promo_sorted[key] = promo_threshold[key]
+    def apply_and_close(self):
+        prices = [price.get() for price in self.prices]
+        promos = [promo.get() for promo in self.promos]
+        # add validation
+        #edit_file(self.filename, dict(zip(prices, promos)))
+        print(self.filename, dict(zip(prices, promos)))
+        self.quit()
+        self.destroy()
 
-with open(file_in, "r") as f_in:
-    lines = f_in.readlines()
 
-header = lines.pop(0)
-header_list = header.strip().split(",")
+def edit_file(filename_in, promo_dict):
 
-with open(file_out, "w") as f_out:
-    print(header[:-1], file=f_out)
+    filename_out = filename_in[:-4] + "_edited.csv"
+    promo_sorted = {}
+    for key in sorted(promo_dict.keys()):
+        promo_sorted[key] = promo_dict[key]
 
-    for line in lines:
+    with open(filename_in, "r") as f_in:
+        lines = f_in.readlines()
 
-        line_split = line.strip().split(",")
-        index_price = int(line_split[-2])
-        new_line = ",".join(line_split[:-4])
-        status = line_split[-4]
+    header = lines.pop(0)
+    header_list = header.strip().split(",")
 
-        for key in promo_sorted.keys():
-            if key <= index_price:
-                new_promo = promo_sorted[key]
+    with open(filename_out, "w") as f_out:
+        print(header[:-1], file=f_out)
+
+        for line in lines:
+
+            line_split = line.strip().split(",")
+            index_price = int(line_split[-2])
+            new_line = ",".join(line_split[:-4])
+            status = line_split[-4]
+
+            for key in promo_sorted.keys():
+                if key <= index_price:
+                    new_promo = promo_sorted[key]
+                else:
+                    break
+
+            if status == "NOT FOR TRADE" or new_promo is None:
+                new_line += f",{status},0,,0"
             else:
-                break
+                new_line += f",{status},1,,{new_promo}"
 
-        if status == "NOT FOR TRADE" or new_promo is None:
-            new_line += f",{status},0,,0"
-        else:
-            new_line += f",{status},1,,{new_promo}"
+            print(new_line, file=f_out)
 
-        print(new_line, file=f_out)
+if __name__ == "__main__":
+    
+    root = GUI()
+    root.mainloop()
