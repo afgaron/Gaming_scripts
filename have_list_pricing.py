@@ -10,7 +10,7 @@ class GUI(tk.Tk):
     def __init__(self, filename, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
         self.title("PucaTrade Marketplace Pricer")
-        #self.filename = fd.askopenfilename()
+        #self.filename = fd.askopenfilename() # getting filename inside the class (and not taking it as an argument) disables the ability to type in the Entry boxes
         self.filename = filename
         self.button_add = None
         self.button_quit = None
@@ -88,7 +88,7 @@ def edit_file(filename_in, promo_dict):
 
 if __name__ == "__main__":
 
-    filename = fd.askopenfilename()
+    filename = fd.askopenfilename() # getting filename outside the class causes an extra pop-up
     
     root = GUI(filename)
     root.mainloop()
