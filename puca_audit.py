@@ -1,8 +1,6 @@
-import requests, pprint, sys
-
-# Backwards compatibility between Python 2 and 3
-if sys.version_info.major == 3:
-    raw_input = input
+from requests import Session
+from pprint import pformat
+import matplotlib.pyplot as plt
 
 # Global variables
 root_url = "https://pucatrade.com"
@@ -16,10 +14,10 @@ def get_query():
     print("    (T)ransactions (sends/receives, fees, etc.)")
     print("    (D)istribution of card values sent/received")
 
-    query = raw_input("").upper()
+    query = input("").upper()
     while query not in ("T", "D"):
         print("Please enter T or D")
-        query = raw_input("").upper()
+        query = input("").upper()
 
     return query
 
@@ -28,14 +26,14 @@ def get_session():
     """Open the session on pucatrade.com"""
 
     # Necessary login information
-    username = raw_input("Email address: ")
-    password = raw_input("Password: ")
+    username = input("Email address: ")
+    password = input("Password: ")
 
     # Check first page of ledger to get dates
     url = root_url + "/account/ledger/2012-01"
     payload = {"login": username, "password": password}
 
-    with requests.Session() as session:
+    with Session() as session:
         post = session.post(login_url, data=payload)
         r = session.get(url)
 
@@ -62,7 +60,7 @@ def get_transactions(urls, payload):
     type_flag = '<div class="label letter">TYPE</div>'
     points_flag = '<div class="label letter">POINTS</div>'
 
-    with requests.Session() as session:
+    with Session() as session:
         post = session.post(login_url, data=payload)
         for url in urls:
             r = session.get(url)
@@ -170,7 +168,7 @@ def get_values(urls, payload):
     type_flag = '<div class="label letter">TYPE</div>'
     points_flag = '<div class="label letter">POINTS</div>'
 
-    with requests.Session() as session:
+    with Session() as session:
         post = session.post(login_url, data=payload)
         for url in urls:
             r = session.get(url)
@@ -207,8 +205,6 @@ def get_values(urls, payload):
 def make_histogram(sending, receiving):
     """Plot a histogram of card values. Require matplotlib"""
 
-    import matplotlib.pyplot as plt
-
     n, bins, patches = plt.hist(sending+receiving, bins=25, log=True)
     plt.clf()
 
@@ -244,7 +240,7 @@ if __name__ == "__main__":
         fout = "puca_transactions.txt"
 
         with open(fout, "w") as f:
-            f.write(pprint.pformat(transactions))
+            f.write(pformat(transactions))
             f.write("\n\n")
             print("Transaction summary written to %s\n" % fout)
 
@@ -261,4 +257,4 @@ if __name__ == "__main__":
 
         make_histogram(sending, receiving)
 
-    raw_input("Press Enter to quit")
+    input("Press Enter to quit")
