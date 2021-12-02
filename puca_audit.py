@@ -1,7 +1,7 @@
 """
 Download the executable version at https://drive.google.com/file/d/1TGGFf8OWZV6t-aCFm0c54Uw_SAXeO9N3/view?usp=sharing
 
-For the smaller version that excludes the plotting option, see 
+For the smaller version that excludes the plotting option, see https://drive.google.com/file/d/15d7Z4mWZVjuWui5OcIWU-jvakCuUDoAn/view?usp=sharing
 
 This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License. Original author is dude1818 on PucaTrade.com (https://pucatrade.com/profiles/show/129317)
 """
@@ -9,7 +9,10 @@ This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 Intern
 from requests import Session
 from pprint import pformat
 from re import findall
+
+# Requires version 3.2.2 to build the exe
 import matplotlib.pyplot as plt
+
 
 # Global variables
 root_url = "https://pucatrade.com"
