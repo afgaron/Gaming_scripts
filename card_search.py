@@ -36,7 +36,7 @@ def get_query() -> str:
     return query
 
 
-def get_deck_names():
+def get_deck_names() -> None:
     """Prompt the user for one or more TappedOut deck urls"""
 
     print("\n(R)eplace or (A)ppend to list of decks?")
@@ -57,7 +57,7 @@ def get_deck_names():
             s = input("")
 
 
-def load_deck_names(filename: str = decks_file) -> list:
+def load_deck_names(filename: str = decks_file) -> list[str]:
     """Load deck names from file"""
 
     deck_names = []
@@ -69,7 +69,7 @@ def load_deck_names(filename: str = decks_file) -> list:
     return deck_names
 
 
-def get_deck_lists(output_dir: str = decks_dir):
+def get_deck_lists(output_dir: str = decks_dir) -> None:
     """Download the deck lists from TappedOut"""
 
     if not os.path.exists(output_dir):
@@ -87,7 +87,7 @@ def get_deck_lists(output_dir: str = decks_dir):
     print("")
 
 
-def parse_deck_list(deck: str) -> list:
+def parse_deck_list(deck: str) -> list[str]:
     """Given a TappedOut deck name, download and parse the deck list"""
 
     response = requests.get("https://tappedout.net/mtg-decks/" + deck)
@@ -104,7 +104,7 @@ def parse_deck_list(deck: str) -> list:
         return []
 
 
-def get_deck_dict(deck_names: Union[str, list]) -> dict:
+def get_deck_dict(deck_names: Union[str, list[str]]) -> dict[str, list[str]]:
     """Extract deck lists from list of deck names and return them as a dictionary"""
 
     if type(deck_names) == str:
@@ -119,7 +119,7 @@ def get_deck_dict(deck_names: Union[str, list]) -> dict:
     return deck_dict
 
 
-def search_for_cards():
+def search_for_cards() -> None:
     """Search deck lists for all instances of user supplied card name"""
 
     deck_names = load_deck_names()
@@ -143,7 +143,7 @@ def search_for_cards():
         card = input("")
 
 
-def get_card_dict(deck_names: Union[str, list]) -> dict:
+def get_card_dict(deck_names: Union[str, list[str]]) -> dict[str, int]:
     """Combine deck lists and extract number of copies of each card"""
 
     deck_dict = get_deck_dict(deck_names)
@@ -163,7 +163,7 @@ def get_card_dict(deck_names: Union[str, list]) -> dict:
     return card_dict
 
 
-def get_frame_dict(card_dict: dict):
+def get_frame_dict(card_dict: dict) -> dict[str, dict[str, int]]:
     """Given a dict with card names as keys, get their frames from ScryFall"""
 
     print("    Getting frame codes from ScryFall; progress:")
@@ -218,7 +218,7 @@ def get_frame_dict(card_dict: dict):
 
 def make_plot(
     min_count: int = 1, include_lands: bool = False, load_from_file: bool = True
-):
+) -> None:
     """Plot the overall color distribution of the decks in the deck_names file.
     min_count: sets the minimum threshold for a card to be included in the plot (default: 1)
     include_lands: sets whether lands should be included in the plot (default: False)
