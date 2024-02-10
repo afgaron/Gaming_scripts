@@ -13,6 +13,7 @@ from bs4 import BeautifulSoup
 decks_dir = "deck_lists"
 decks_file = "deck_urls.txt"
 frame_file = "card_frames.json"
+tappedout = "https://tappedout.net/"
 
 plt.ion()
 
@@ -79,28 +80,48 @@ def get_deck_lists(output_dir: str = decks_dir) -> None:
 
     for deck in deck_names:
         print("    Getting deck list for", deck)
-        deck_list = parse_deck_list(deck)
-        with open(os.path.join(output_dir, deck + ".txt"), "w") as f:
+        filepath = os.path.join(output_dir, deck + ".txt")
+        with open(filepath, "r") as f:
+            current_deck_list = f.read()
+        if "<!DOCTYPE html>" in current_deck_list:
+            html = get_html_from_file(filepath)
+        else:
+            html = get_html_from_url(tappedout + "mtg-decks/" + deck)
+        deck_list = parse_deck_list(html)
+        with open(filepath, "w") as f:
             for card in deck_list:
                 f.write(card.strip("1 ") + "\n")
 
     print("")
 
 
-def parse_deck_list(deck: str) -> list[str]:
-    """Given a TappedOut deck name, download and parse the deck list"""
+def get_html_from_url(url: str) -> str:
+    """Given a TappedOut deck name, download the HTML from the web"""
 
-    response = requests.get("https://tappedout.net/mtg-decks/" + deck)
+    response = requests.get(url)
+    return response.text
+
+
+def get_html_from_file(filepath: str) -> str:
+    """Given a TappedOut deck name, load the HTML from a file"""
+
+    with open(filepath, "r") as f:
+        text = f.read()
+    return text
+
+
+def parse_deck_list(html: str) -> list[str]:
+    """Given an HTML string, parse the deck list"""
 
     start = r'<input type="hidden" name="c" value="'
     end = r'">'
-    match = re.search(f"{start}(.*?){end}", response.text)
+    match = re.search(f"{start}(.*?){end}", html)
 
     if match:
         raw_string = match.group(1)
         return BeautifulSoup(raw_string, features="html.parser").get_text().split("||")
     else:
-        print(f"    Error: Failed to retrieve deck list for {deck}")
+        print("    Error: Failed to parse deck list")
         return []
 
 
