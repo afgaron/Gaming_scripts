@@ -81,12 +81,18 @@ def get_deck_lists(output_dir: str = decks_dir) -> None:
     for deck in deck_names:
         print("    Getting deck list for", deck)
         filepath = os.path.join(output_dir, deck + ".txt")
-        with open(filepath, "r") as f:
-            current_deck_list = f.read()
-        if "<!DOCTYPE html>" in current_deck_list:
-            html = get_html_from_file(filepath)
+
+        if os.path.exists(filepath):
+            with open(filepath, "r") as f:
+                current_deck_list = f.read()
+            if "<!DOCTYPE html>" in current_deck_list:
+                html = get_html_from_file(filepath)
+            else:
+                html = get_html_from_url(tappedout + "mtg-decks/" + deck)
+
         else:
             html = get_html_from_url(tappedout + "mtg-decks/" + deck)
+            
         deck_list = parse_deck_list(html)
         with open(filepath, "w") as f:
             for card in deck_list:
