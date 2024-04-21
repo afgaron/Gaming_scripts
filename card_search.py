@@ -1,6 +1,7 @@
 import os
 import re
 import string
+import time
 from typing import Union
 
 import requests
@@ -18,8 +19,8 @@ def get_query() -> str:
     print("Options:")
     print("    (E)nter TappedOut deck urls")
     print("    (D)ownload deck lists")
+    print("    (P)arse deck lists")
     print("    (S)earch for cards")
-    print("    (P)lot color distribution")
     print("    (Q)uit")
     print("")
 
@@ -74,21 +75,27 @@ def get_deck_lists(output_dir: str = decks_dir) -> None:
 
     for deck in deck_names:
         print("    Getting deck list for", deck)
-        filepath = os.path.join(output_dir, deck + ".txt")
+        output = os.path.join(output_dir, deck + ".html")
+        html = get_html_from_url(tappedout + "mtg-decks/" + deck)
+        with open(output, "w", encoding="utf-8") as f:
+            f.write(html)
+        time.sleep(1)
 
-        if os.path.exists(filepath):
-            with open(filepath, "r") as f:
-                current_deck_list = f.read()
-            if "<!DOCTYPE html>" in current_deck_list:
-                html = get_html_from_file(filepath)
-            else:
-                html = get_html_from_url(tappedout + "mtg-decks/" + deck)
+    print("")
 
-        else:
-            html = get_html_from_url(tappedout + "mtg-decks/" + deck)
 
+def parse_deck_lists(output_dir: str = decks_dir) -> None:
+    """Parse the deck lists from TappedOut"""
+
+    deck_names = load_deck_names()
+
+    for deck in deck_names:
+        print("    Parsing deck list for", deck)
+        input = os.path.join(output_dir, deck + ".html")
+        output = os.path.join(output_dir, deck + ".txt")
+        html = get_html_from_file(input)
         deck_list = parse_deck_list(html)
-        with open(filepath, "w") as f:
+        with open(output, "w", encoding="utf-8") as f:
             for card in deck_list:
                 f.write(card.strip("1 ") + "\n")
 
@@ -174,9 +181,14 @@ if __name__ == "__main__":
                 get_deck_lists()
             except FileNotFoundError:
                 print("    Need to enter deck names first!")
+        elif query == "P":
+            try:
+                parse_deck_lists()
+            except FileNotFoundError:
+                print("    Need to download deck lists first!")
         elif query == "S":
             try:
                 search_for_cards()
             except FileNotFoundError:
-                print("    Need to download deck lists first!")
+                print("    Need to parse deck lists first!")
         query = get_query()
