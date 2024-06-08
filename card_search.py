@@ -112,7 +112,7 @@ def get_html_from_url(url: str) -> str:
 def get_html_from_file(filepath: str) -> str:
     """Given a TappedOut deck name, load the HTML from a file"""
 
-    with open(filepath, "r") as f:
+    with open(filepath, "r", encoding="utf-8") as f:
         text = f.read()
     return text
 
