@@ -21,13 +21,13 @@ def get_query() -> str:
     print("    (D)ownload deck lists")
     print("    (P)arse deck lists")
     print("    (S)earch for cards")
+    print("    (G)ame Changer counts")
     print("    (Q)uit")
     print("")
 
-    query = input("").upper()
-    while query not in ("E", "D", "S", "P", "Q", ""):
-        print("Please enter E, D, S, P, or Q")
-        query = input("").upper()
+    options = ("E", "D", "P", "S", "G", "Q")
+    while (query := input().upper()) not in (*options, ""):
+        print(f"Please enter one of {', '.join(options)}")
 
     return query
 
@@ -37,20 +37,14 @@ def get_deck_names() -> None:
 
     print("\n(R)eplace or (A)ppend to list of decks?")
 
-    mode = input().upper()
-    while mode not in ("A", "R"):
+    while (mode := input().upper()) not in ("A", "R"):
         print("Please enter A or R")
-        mode = input("").upper()
 
-    mode = "w" if mode == "R" else "a"
-
-    with open(decks_file, mode) as f:
+    with open(decks_file, "w" if mode == "R" else "a") as f:
         print("Add deck names one per line")
 
-        s = input("")
-        while s:
+        while s := input():
             f.write(s.strip() + "\n")
-            s = input("")
 
 
 def load_deck_names(filename: str = decks_file) -> list[str]:
@@ -79,7 +73,7 @@ def get_deck_lists(output_dir: str = decks_dir) -> None:
         html = get_html_from_url(tappedout + "mtg-decks/" + deck)
         with open(output, "w", encoding="utf-8") as f:
             f.write(html)
-        time.sleep(1)
+        time.sleep(4)
 
     print("")
 
@@ -122,9 +116,8 @@ def parse_deck_list(html: str) -> list[str]:
 
     start = r'<input type="hidden" name="c" value="'
     end = r'">'
-    match = re.search(f"{start}(.*?){end}", html)
 
-    if match:
+    if match := re.search(f"{start}(.*?){end}", html):
         raw_string = match.group(1)
         return BeautifulSoup(raw_string, features="html.parser").get_text().split("||")
     else:
@@ -154,8 +147,7 @@ def search_for_cards() -> None:
     deck_dict = get_deck_dict(deck_names)
 
     print("Enter full card name:")
-    card = input("")
-    while len(card):
+    while card := input():
         hits = []
         for deck in deck_dict:
             if card.lower() in deck_dict[deck]:
@@ -168,12 +160,35 @@ def search_for_cards() -> None:
             print(f"\n{string.capwords(card)} was not found in any decks")
 
         print("\nEnter another full card name, or leave blank to exit:")
-        card = input("")
+
+
+def game_changers() -> None:
+    """Count the number of Game Changers in each deck list"""
+
+    gc_file = "gamechangers.txt"
+    with open(gc_file, "r") as f:
+        lines = f.readlines()
+
+    gc_set = set()
+    for line in lines:
+        gc_set.add(line.strip().lower())
+
+    deck_names = load_deck_names()
+    deck_dict = get_deck_dict(deck_names)
+
+    gc_counts = {}
+    for name, decklist in deck_dict.items():
+        gc_counts[name] = len(gc_set.intersection(decklist))
+
+    print("Number of Game Changers in each deck:")
+    for name, gc_count in gc_counts.items():
+        print(f"    {name}: {gc_count}")
+
+    print("")
 
 
 if __name__ == "__main__":
-    query = get_query()
-    while query not in ("Q", ""):
+    while (query := get_query()) not in ("Q", ""):
         if query == "E":
             get_deck_names()
         elif query == "D":
@@ -191,4 +206,8 @@ if __name__ == "__main__":
                 search_for_cards()
             except FileNotFoundError:
                 print("    Need to parse deck lists first!")
-        query = get_query()
+        elif query == "G":
+            try:
+                game_changers()
+            except FileNotFoundError:
+                print("    Need to parse deck lists first!")
