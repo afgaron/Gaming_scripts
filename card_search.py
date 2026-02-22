@@ -19,7 +19,7 @@ def get_query() -> str:
     print("Options:")
     print("    (E)nter TappedOut deck urls")
     print("    (D)ownload deck lists")
-    print("    (P)arse deck lists")
+    # print("    (P)arse deck lists")
     print("    (S)earch for cards")
     print("    (G)ame Changer counts")
     print("    (Q)uit")
@@ -54,7 +54,8 @@ def load_deck_names(filename: str = decks_file) -> list[str]:
 
     with open(filename, "r") as f:
         for line in f:
-            deck_names.append(line.strip())
+            if line.strip()[0] != "#":
+                deck_names.append(line.strip())
 
     return deck_names
 
@@ -73,9 +74,11 @@ def get_deck_lists(output_dir: str = decks_dir) -> None:
         html = get_html_from_url(tappedout + "mtg-decks/" + deck)
         with open(output, "w", encoding="utf-8") as f:
             f.write(html)
-        time.sleep(4)
+        time.sleep(3)
 
     print("")
+        
+    parse_deck_lists(output_dir)
 
 
 def parse_deck_lists(output_dir: str = decks_dir) -> None:

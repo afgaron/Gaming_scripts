@@ -159,7 +159,7 @@ def make_plot(
 if __name__ == "__main__":
     min_count = input("Enter minimum card count (default: 1): ")
     include_lands = input("Include lands? (y)es/(N)o: ")
-    load_from_file = input("Load frames from file? (Y)es/(n)o: ")
+    load_from_file = input("Load saved cards from file? (Y)es/(n)o: ")
     try:
         make_plot(
             int(min_count or 1),
@@ -169,5 +169,7 @@ if __name__ == "__main__":
     except FileNotFoundError:
         print("Need to download deck lists first!")
     while True:
-        input("Press enter to tighten plot")
+        tighten = input("Press Q to quit or any key to tighten plot: ")
+        if tighten.lower() == "q":
+            exit()
         plt.tight_layout()
